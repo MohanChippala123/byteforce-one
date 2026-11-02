@@ -24,6 +24,37 @@
       <div class="bar"><span data-progress></span></div>
     </div>
 
+    <section class="scripts">
+      <h2>Scripts</h2>
+      <ul class="files">
+        <li>
+          <a class="file" href="windows-scripts/password-management.bat" download>password-management.bat</a>
+          <span class="desc">Sets password and lockout policy, disables Guest, and runs gpupdate.</span>
+          <details class="code" data-script="windows-scripts/password-management.bat">
+            <summary>View script</summary>
+            <pre><code>Loading...</code></pre>
+          </details>
+        </li>
+        <li>
+          <a class="file" href="windows-scripts/password-management.ps1" download>password-management.ps1</a>
+          <span class="desc">PowerShell policy script with password-expiry cleanup.</span>
+          <details class="code" data-script="windows-scripts/password-management.ps1">
+            <summary>View script</summary>
+            <pre><code>Loading...</code></pre>
+          </details>
+        </li>
+        <li>
+          <a class="file" href="windows-scripts/user-management.ps1" download>user-management.ps1</a>
+          <span class="desc">Read-only audit of local users, admins, duplicate names, and stale passwords.</span>
+          <details class="code" data-script="windows-scripts/user-management.ps1">
+            <summary>View script</summary>
+            <pre><code>Loading...</code></pre>
+          </details>
+        </li>
+      </ul>
+      <p class="hint">Run as administrator: <code>powershell -ExecutionPolicy Bypass -File .\script.ps1</code>. <code>password-management.bat</code> is the CMD version.</p>
+    </section>
+
     <div data-checklist="windows1">
 
       <section>

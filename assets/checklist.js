@@ -3,6 +3,25 @@
   var board = document.querySelector("[data-checklist]");
   if (!board) return;
 
+  Array.prototype.forEach.call(document.querySelectorAll("details[data-script]"), function (details) {
+    details.addEventListener("toggle", function () {
+      if (!details.open || details.getAttribute("data-loaded")) return;
+      details.setAttribute("data-loaded", "1");
+      var code = details.querySelector("code");
+      fetch(details.getAttribute("data-script"))
+        .then(function (response) {
+          if (!response.ok) throw new Error("request failed");
+          return response.text();
+        })
+        .then(function (text) {
+          code.textContent = text;
+        })
+        .catch(function () {
+          code.textContent = "Could not load this script.";
+        });
+    });
+  });
+
   var key = "byteforce:checklist:" + board.getAttribute("data-checklist");
   var boxes = Array.prototype.slice.call(board.querySelectorAll('input[type="checkbox"]'));
   var fill = document.querySelector("[data-progress]");
