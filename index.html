@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Byteforce One</title>
+  <script src="assets/gate.js"></script>
+  <link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Byteforce One</a>
+      <nav><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="https://gitlab.com/SO1213/byteforce-one" target="_blank" rel="noopener">GitLab</a></nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Byteforce One</h1>
+
+    <ul class="list">
+      <li>
+        <a href="ubuntu-checklist.html">Ubuntu checklist</a>
+        <span class="meta">17 items</span>
+      </li>
+      <li>
+        <a href="linux-scripts.html">Linux scripts</a>
+        <span class="meta">6 scripts</span>
+      </li>
+      <li>
+        <a href="windows-checklist.html">Windows checklist</a>
+        <span class="meta">27 items</span>
+      </li>
+      <li>
+        <a href="windows-scripts.html">Windows scripts</a>
+        <span class="meta">3 scripts</span>
+      </li>
+    </ul>
+
+  </main>
+
+  <script>
+    window.addEventListener("keydown", function (event) {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+      switch (event.key) {
+        case "1":
+          window.location.href = "ubuntu-checklist.html";
+          break;
+        case "2":
+          window.location.href = "linux-scripts.html";
+          break;
+        case "3":
+          window.location.href = "windows-checklist.html";
+          break;
+        case "4":
+          window.location.href = "windows-scripts.html";
+          break;
+        default:
+          return;
+      }
+    });
+  </script>
+
+</body>
+</html>

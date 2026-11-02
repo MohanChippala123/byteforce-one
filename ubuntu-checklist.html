@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ubuntu checklist - Byteforce One</title>
+  <script src="assets/gate.js"></script>
+  <link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Byteforce One</a>
+      <nav><a href="index.html">All tools</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="https://gitlab.com/SO1213/byteforce-one" target="_blank" rel="noopener">GitLab</a></nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Ubuntu checklist</h1>
+
+    <div class="progress">
+      <span data-progress-label>0 / 17</span>
+      <div class="bar"><span data-progress></span></div>
+    </div>
+
+    <div data-checklist="ubuntu">
+
+      <section>
+        <h2>Initial Response &amp; Docs</h2>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="item1">
+            <label for="item1">Make a timestamp/recovery image</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item2">
+            <label for="item2">Get a root shell and keep it open</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item3">
+            <label for="item3">Forensics questions</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item4">
+            <label for="item4">Finish readme instructions</label>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>User &amp; Access Management</h2>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="item5">
+            <label for="item5">Add missing users</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item6">
+            <label for="item6">Remove unauthorized users</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item7">
+            <label for="item7">Remove unauthorized admins</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item8">
+            <label for="item8">Add passwords to user accounts missing a password</label>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>System Hardening &amp; Cleanup</h2>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="item9">
+            <label for="item9">Delete hacking tools</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item10">
+            <label for="item10">Delete media and games</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item11">
+            <label for="item11">Update chromium to latest stable version</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item12">
+            <label for="item12">Set chromium settings to most secure</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item13">
+            <label for="item13">Ensure dns is secure</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item14">
+            <label for="item14">Look for weird services</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item15">
+            <label for="item15">Set pam files</label>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Final Audits &amp; Lockdown</h2>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="item16">
+            <label for="item16">Run lynis scan</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item17">
+            <label for="item17">Lock root account</label>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+
+    <div class="actions">
+      <button type="button" data-reset>Reset</button>
+      <button type="button" data-print>Print</button>
+    </div>
+  </main>
+
+  <script src="assets/checklist.js"></script>
+</body>
+</html>

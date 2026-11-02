@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows checklist - Byteforce One</title>
+  <script src="assets/gate.js"></script>
+  <link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Byteforce One</a>
+      <nav><a href="index.html">All tools</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="https://gitlab.com/SO1213/byteforce-one" target="_blank" rel="noopener">GitLab</a></nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Windows checklist</h1>
+
+    <div class="progress">
+      <span data-progress-label>0 / 27</span>
+      <div class="bar"><span data-progress></span></div>
+    </div>
+
+    <div data-checklist="windows">
+
+      <section>
+        <h2>Initial Response &amp; Docs</h2>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="item1">
+            <label for="item1">Make a timestamp/recovery image</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item2">
+            <label for="item2">Get an admin shell and keep it open</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item3">
+            <label for="item3">Forensics questions</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item4">
+            <label for="item4">Finish readme instructions</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item5">
+            <label for="item5">Note the machine name and if it is on a domain</label>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>User &amp; Access Management</h2>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="item6">
+            <label for="item6">Add missing users</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item7">
+            <label for="item7">Remove unauthorized users</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item8">
+            <label for="item8">Remove unauthorized admins</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item9">
+            <label for="item9">Add passwords to user accounts missing a password</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item10">
+            <label for="item10">Disable or delete unused built-in accounts</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item11">
+            <label for="item11">Check Administrators and Remote Desktop Users groups</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item12">
+            <label for="item12">Check for unauthorized local groups</label>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>System Hardening &amp; Cleanup</h2>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="item13">
+            <label for="item13">Delete hacking tools</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item14">
+            <label for="item14">Delete media and games</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item15">
+            <label for="item15">Remove unauthorized software</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item16">
+            <label for="item16">Set password and lockout policy</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item17">
+            <label for="item17">Set UAC to the highest level</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item18">
+            <label for="item18">Disable Remote Assistance and restrict RDP</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item19">
+            <label for="item19">Enable Windows Firewall on all profiles</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item20">
+            <label for="item20">Ensure Windows Update and Defender are on and updated</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item21">
+            <label for="item21">Check autoruns and scheduled tasks</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item22">
+            <label for="item22">Look for weird services</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item23">
+            <label for="item23">Check browser settings and remove extensions</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item24">
+            <label for="item24">Ensure dns is secure</label>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Final Audits &amp; Lockdown</h2>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="item25">
+            <label for="item25">Re-check all local users and admins</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item26">
+            <label for="item26">Re-read the readme for missed items</label>
+          </li>
+          <li>
+            <input type="checkbox" id="item27">
+            <label for="item27">Record score changes</label>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+
+    <div class="actions">
+      <button type="button" data-reset>Reset</button>
+      <button type="button" data-print>Print</button>
+    </div>
+  </main>
+
+  <script src="assets/checklist.js"></script>
+</body>
+</html>

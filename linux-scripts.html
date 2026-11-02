@@ -1,0 +1,366 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linux scripts - Byteforce One</title>
+  <script src="assets/gate.js"></script>
+  <link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Byteforce One</a>
+      <nav><a href="index.html">All tools</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="https://gitlab.com/SO1213/byteforce-one" target="_blank" rel="noopener">GitLab</a></nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Linux scripts</h1>
+
+    <ul class="files">
+      <li>
+        <a class="file" href="linux-scripts/linux-hacking-tools.sh" download>linux-hacking-tools.sh</a>
+        <span class="desc">Lists installed auditing and hacking tools by package name.</span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>#!/usr/bin/env bash
+
+set -x
+set -uo pipefail
+
+# Regex containing top 50 auditing &amp; security tool package names
+TOOLS_REGEX='^(aircrack-ng|airgeddon|amass|arp-scan|bettercap|bloodhound|burpsuite|cewl|crackmapexec|crunch|dirb|dirbuster|dnsrecon|dsniff|ettercap-text-only|ffuf|fierce|gobuster|hashcat|hping3|hydra|impacket-scripts|john|kismet|maltego|masscan|medusa|metasploit-framework|mimikatz|ncrack|netexec|netsniff-ng|nikto|nmap|ophcrack|pixiewps|powersploit|reaver|recon-ng|responder|sqlmap|tcpdump|theharvester|tshark|unicornscan|wfuzz|wifite|wireshark|wpscan|zaproxy)$'
+
+echo "[+] Checking installed packages on Ubuntu..."
+
+dpkg-query -W -f='${Status} ${Package}\n' 2&gt;/dev/null | \
+  awk '/install ok installed/ {print $4}' | \
+  grep -E -i "$TOOLS_REGEX"</code></pre>
+        </details>
+      </li>
+      <li>
+        <a class="file" href="linux-scripts/ubuntu-nopasswd-users.sh" download>ubuntu-nopasswd-users.sh</a>
+        <span class="desc">Finds accounts with an empty password hash in /etc/shadow.</span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>#!/usr/bin/env bash
+
+set -x
+set -uo pipefail
+
+# Ensure the script is run with superuser privileges to access /etc/shadow
+if [ "$EUID" -ne 0 ]; then
+    echo "Error: This script must be run as root or with sudo." &gt;&amp;2
+    exit 1
+fi
+
+echo "[+] Searching for user accounts without passwords..."
+
+# Query /etc/shadow for accounts where the second field (password hash) is empty
+NO_PASSWORD_USERS=$(awk -F: '$2 == "" { print $1 }' /etc/shadow)
+
+if [ -n "$NO_PASSWORD_USERS" ]; then
+    echo "[!] Warning: The following user accounts have NO password set:"
+    echo "$NO_PASSWORD_USERS"
+else
+    echo "[+] No user accounts with empty passwords were found."
+fi</code></pre>
+        </details>
+      </li>
+      <li>
+        <a class="file" href="linux-scripts/ubuntu-user-management.sh" download>ubuntu-user-management.sh</a>
+        <span class="desc">Add or remove users and manage group membership.</span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>#!/usr/bin/env bash
+
+set -x
+set -uo pipefail
+
+if [[ $EUID -ne 0 ]]; then
+    echo "Error: This script must be run as root or with sudo." &gt;&amp;2
+    exit 1
+fi
+
+function get_valid_count() {
+    local prompt="$1"
+    local count
+    while true; do
+        read -rp "$prompt" count
+        if [[ "$count" =~ ^[1-9][0-9]*$ ]]; then
+            echo "$count"
+            return 0
+        fi
+        echo "Please enter a valid positive number." &gt;&amp;2
+    done
+}
+
+is_valid_name() {
+    local name="$1"
+    [[ "$name" =~ ^[a-z_][a-z0-9_-]*\$?$ ]]
+}
+
+echo "Select an operation:"
+echo "1) Add users"
+echo "2) Remove users"
+echo "3) List system users"
+echo "4) List groups for users"
+echo "5) Add user to a group"
+echo "6) Remove user from a group"
+read -rp "Option [1-6]: " operationType
+
+case "$operationType" in
+    1)
+        count=$(get_valid_count "How many users to add? ")
+        for ((i=1; i&lt;=count; i++)); do
+            read -rp "Enter username $i: " username
+
+            if ! is_valid_name "$username"; then
+                echo "Invalid username format. Skipping..."
+                continue
+            fi
+
+            if id "$username" &amp;&gt;/dev/null; then
+                echo "User '$username' already exists. Skipping..."
+            else
+                echo "Creating user '$username'..."
+                useradd -m "$username" &amp;&amp; echo "Successfully created '$username'."
+            fi
+        done
+        ;;
+
+    2)
+        count=$(get_valid_count "How many users to remove? ")
+        for ((i=1; i&lt;=count; i++)); do
+            read -rp "Enter username $i to remove: " username
+
+            if ! id "$username" &amp;&gt;/dev/null; then
+                echo "User '$username' does not exist. Skipping..."
+                continue
+            fi
+
+            echo "Removing user '$username'..."
+            userdel -r "$username" &amp;&amp; echo "Successfully removed '$username'."
+        done
+        ;;
+
+    3)
+        echo -e "\nStandard System Users (UID &gt;= 1000):"
+        awk -F: '$3 &gt;= 1000 &amp;&amp; $3 != 65534 {print $1}' /etc/passwd
+        ;;
+
+    4)
+        count=$(get_valid_count "How many users to check? ")
+        for ((i=1; i&lt;=count; i++)); do
+            read -rp "Enter username $i: " username
+
+            if id "$username" &amp;&gt;/dev/null; then
+                groups "$username"
+            else
+                echo "User '$username' does not exist."
+            fi
+        done
+        ;;
+
+    5)
+        count=$(get_valid_count "How many user assignments? ")
+        for ((i=1; i&lt;=count; i++)); do
+            read -rp "Enter username $i: " username
+
+            if ! id "$username" &amp;&gt;/dev/null; then
+                echo "User '$username' does not exist. Skipping..."
+                continue
+            fi
+
+            read -rp "Enter group name: " groupname
+
+            if getent group "$groupname" &amp;&gt;/dev/null; then
+                usermod -aG "$groupname" "$username" &amp;&amp; echo "Added '$username' to group '$groupname'."
+            else
+                echo "Group '$groupname' does not exist. Skipping..."
+            fi
+        done
+        ;;
+
+    6)
+        count=$(get_valid_count "How many user removals from groups? ")
+        for ((i=1; i&lt;=count; i++)); do
+            read -rp "Enter username $i: " username
+
+            if ! id "$username" &amp;&gt;/dev/null; then
+                echo "User '$username' does not exist. Skipping..."
+                continue
+            fi
+
+            read -rp "Enter group name: " groupname
+
+            if getent group "$groupname" &amp;&gt;/dev/null; then
+                gpasswd -d "$username" "$groupname" &amp;&amp; echo "Removed '$username' from group '$groupname'."
+            else
+                echo "Group '$groupname' does not exist. Skipping..."
+            fi
+        done
+        ;;
+
+    *)
+        echo "Invalid choice. Please choose a number between 1 and 6."
+        exit 1
+        ;;
+esac</code></pre>
+        </details>
+      </li>
+      <li>
+        <a class="file" href="linux-scripts/media.sh" download>media.sh</a>
+        <span class="desc">Finds media and game files by extension and by app category.</span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>#!/usr/bin/env bash
+
+set -x
+set -uo pipefail
+
+EXTENSIONS=("mp3" "flac" "wav" "ogg" "mp4" "mkv" "avi" "webm" "iso" "appimage" "rom")
+CATEGORIES=("Game" "AudioVideo" "Media" "Audio" "Video")
+
+echo "by Extension: "
+for ext in "${EXTENSIONS[@]}"; do
+    echo "Extension: .$ext"
+    find ~ -type f -iname "*.$ext" 2&gt;/dev/null
+done
+
+echo ""
+echo "by Category: "
+for cat in "${CATEGORIES[@]}"; do
+    echo "Category: $cat"
+    grep -rnw -e "Categories=.*$cat" /usr/share/applications ~/.local/share/applications /var/lib/snapd/desktop/applications /var/lib/flatpak/exports/share/applications 2&gt;/dev/null | cut -d: -f1 | sort -u
+done</code></pre>
+        </details>
+      </li>
+      <li>
+        <a class="file" href="linux-scripts/bakdoor.sh" download>bakdoor.sh</a>
+        <span class="desc">Checks reverse shells, cron entries, SSH keys, and extra root users. <span class="warn">Unstable.</span></span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>
+#!/bin/bash
+
+if [ "$EUID" -ne 0 ]; then
+  echo "run as root r u too dumb to figure that out?"
+  exit 1
+fi
+
+set -u
+
+echo "[+] checking reverse shells"
+PROCESS_PATTERN='nc[[:space:]].*(-e|--exec)|ncat[[:space:]].*(-e|--exec)|netcat[[:space:]].*(-e|--exec)|socat.*(EXEC|SYSTEM)|/dev/tcp/|bash[[:space:]]+-i'
+
+if ps -eo pid=,args= | grep -E "$PROCESS_PATTERN" | grep -v -E 'grep -E|bakdoor\.sh'; then
+  echo "[!] check these processes"
+else
+  echo "[+] reverse shells GONE"
+fi
+
+echo "[+] cleaning the users crontab"
+CRON_PATTERN='(/dev/tcp/|nc[[:space:]].*(-e|--exec)|ncat[[:space:]].*(-e|--exec)|netcat[[:space:]].*(-e|--exec)|socat.*(EXEC|SYSTEM)|curl.*\|[[:space:]]*(sh|bash)|wget.*\|[[:space:]]*(sh|bash))'
+
+if command -v crontab &gt;/dev/null 2&gt;&amp;1; then
+  while IFS=: read -r user _; do
+    matches=$(crontab -u "$user" -l 2&gt;/dev/null | grep -Ein "$CRON_PATTERN" || true)
+    if [ -n "$matches" ]; then
+      echo "[!] check cron for $user"
+      printf '%s\n' "$matches"
+    fi
+  done &lt; /etc/passwd
+fi
+
+for cronfile in /etc/crontab /etc/cron.d/*; do
+  [ -f "$cronfile" ] || continue
+  matches=$(grep -Ein "$CRON_PATTERN" "$cronfile" 2&gt;/dev/null || true)
+  if [ -n "$matches" ]; then
+    echo "[!] check $cronfile"
+    printf '%s\n' "$matches"
+  fi
+done
+
+echo "[+] checking ssh keys"
+for keyfile in /root/.ssh/authorized_keys /home/*/.ssh/authorized_keys; do
+  [ -f "$keyfile" ] || continue
+  echo "[!] check $keyfile"
+  ls -l "$keyfile"
+done
+
+echo "[+] shell stuff"
+SHELL_PATTERN='(/dev/tcp/|bash[[:space:]]+-i|nc[[:space:]].*(-e|--exec)|ncat[[:space:]].*(-e|--exec)|netcat[[:space:]].*(-e|--exec)|socat.*(EXEC|SYSTEM)|curl.*\|[[:space:]]*(sh|bash)|wget.*\|[[:space:]]*(sh|bash))'
+
+for config in /root/.bashrc /root/.profile /home/*/.bashrc /home/*/.profile; do
+  [ -f "$config" ] || continue
+  matches=$(grep -Ein "$SHELL_PATTERN" "$config" 2&gt;/dev/null || true)
+  if [ -n "$matches" ]; then
+    echo "[!] check $config"
+    printf '%s\n' "$matches"
+  fi
+done
+
+echo "[+]"
+EXTRA_ROOTS=$(awk -F: '($3 == 0 &amp;&amp; $1 != "root") { print $1 }' /etc/passwd)
+
+if [ -n "$EXTRA_ROOTS" ]; then
+  echo "[!] check these users"
+  printf '%s\n' "$EXTRA_ROOTS"
+else
+  echo "[+] no extra root users"
+fi
+
+echo "[+] this script is done if u couldn't tell"</code></pre>
+        </details>
+      </li>
+      <li>
+        <a class="file" href="linux-scripts/sus-services.sh" download>sus-services.sh</a>
+        <span class="desc">Flags services running from unusual directories and lists unit states. <span class="warn">Unstable.</span></span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>#!/bin/bash
+
+echo " this checks for services running on weird directories"
+
+if ! command -v systemctl &gt;/dev/null 2&gt;&amp;1; then
+    echo "[!] systemctl is NOT found btw"
+    exit 1
+fi
+
+while IFS= read -r svc; do
+    [ -n "$svc" ] || continue
+
+    cmd=$(systemctl show "$svc" -p ExecStart --no-pager 2&gt;/dev/null)
+
+    if printf '%s\n' "$cmd" | grep -qE '(/tmp/|/var/tmp/|/dev/shm/|/home/)'; then
+        echo "--&gt; FLAG: $svc isnt in place ig"
+        echo "    $cmd"
+    fi
+done &lt; &lt;(systemctl list-unit-files --type=service --no-legend --no-pager | awk 'NF {print $1}')
+
+echo ""
+echo "services that run at boot basically startup apps"
+systemctl list-unit-files --type=service --state=enabled --no-legend --no-pager | awk 'NF {print $1}'
+
+echo ""
+echo "stuff running rn"
+systemctl list-units --type=service --state=running --no-legend --no-pager | awk 'NF {print $1}'
+
+echo ""
+echo "stuff that crashed"
+systemctl list-units --type=service --state=failed --no-legend --no-pager
+
+echo ""
+echo "[+] done if u couldn't tell"</code></pre>
+        </details>
+      </li>
+    </ul>
+
+    <p class="hint">Run with <code>sudo bash &lt;script&gt;.sh</code>. Only <code>ubuntu-user-management.sh</code> changes the system.</p>
+  </main>
+
+</body>
+</html>

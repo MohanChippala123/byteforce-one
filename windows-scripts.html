@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows scripts - Byteforce One</title>
+  <script src="assets/gate.js"></script>
+  <link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Byteforce One</a>
+      <nav><a href="index.html">All tools</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="https://gitlab.com/SO1213/byteforce-one" target="_blank" rel="noopener">GitLab</a></nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Windows scripts</h1>
+
+    <ul class="files">
+      <li>
+        <a class="file" href="windows-scripts/password-management.bat" download>password-management.bat</a>
+        <span class="desc">Sets password and lockout policy, disables Guest, and runs gpupdate.</span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>@echo off
+echo this is password managemnt but the bat file instead of a ps1 file
+net accounts /minpwlen:12 /maxpwage:30 /minpwage:1 /unique:5 /lockoutthreshold:5 /lockoutduration:30 /lockoutwindow:30
+
+echo making guest acc gone
+net user Guest /active:no
+
+echo policy update
+gpupdate /force
+
+echo done cro
+pause</code></pre>
+        </details>
+      </li>
+      <li>
+        <a class="file" href="windows-scripts/password-management.ps1" download>password-management.ps1</a>
+        <span class="desc">PowerShell policy script with password-expiry cleanup.</span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>Write-Host "pswd and shit"
+net accounts /minpwlen:12 /maxpwage:30 /minpwage:1 /unique:5 /lockoutthreshold:5 /lockoutduration:30 /lockoutwindow:30
+
+Write-Host "fuc that guest account"
+Disable-LocalUser -Name "Guest" -ErrorAction SilentlyContinue
+
+Write-Host "making sure the psds dont expire"
+$users = Get-LocalUser | Where-Object { $_.Name -notin @("Administrator", "Guest", "DefaultAccount", "WDAGUtilityAccount") }
+foreach ($user in $users) {
+    Set-LocalUser -Name $user.Name -PasswordNeverExpires $false -ErrorAction SilentlyContinue
+    Write-Host "Updated settings for: $($user.Name)"
+}
+
+Write-Host "refrshing the group polocy thing"
+gpupdate /force
+
+Write-Host "its done btw"</code></pre>
+        </details>
+      </li>
+      <li>
+        <a class="file" href="windows-scripts/user-management.ps1" download>user-management.ps1</a>
+        <span class="desc">Read-only audit of local users, admins, duplicate names, and stale passwords.</span>
+        <details class="code">
+          <summary>View script</summary>
+          <pre><code>
+$ErrorActionPreference = "SilentlyContinue"
+
+Write-Host ""
+Write-Host " checking windows users n stuff"
+Write-Host ""
+
+$currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+$isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if (-not $isAdmin) {
+    Write-Host "[!] run as administrator if u want all the info"
+}
+
+if (-not (Get-Command Get-LocalUser -ErrorAction SilentlyContinue)) {
+    Write-Host "[!] cant find the local user commands"
+    exit 1
+}
+
+Write-Host "[+] getting all the users"
+$users = Get-LocalUser
+
+foreach ($user in $users) {
+    Write-Host ""
+    Write-Host "user: $($user.Name)"
+    Write-Host "  enabled: $($user.Enabled)"
+    Write-Host "  password required: $($user.PasswordRequired)"
+    Write-Host "  password last set: $($user.PasswordLastSet)"
+    Write-Host "  password never expires: $($user.PasswordNeverExpires)"
+
+    if (-not $user.Enabled) {
+        Write-Host "  [!] this account is disabled"
+    }
+
+    if (-not $user.PasswordRequired) {
+        Write-Host "  [!] this account doesnt require a password"
+    }
+
+    if ($user.PasswordNeverExpires) {
+        Write-Host "  [!] this password never expires"
+    }
+}
+
+Write-Host ""
+Write-Host "who has admin cuz they basically control the pc btw"
+
+$adminGroup = Get-LocalGroup -SID "S-1-5-32-544"
+
+if ($adminGroup) {
+    Get-LocalGroupMember -Group $adminGroup.Name |
+        Select-Object Name, ObjectClass, PrincipalSource |
+        Format-Table -AutoSize
+} else {
+    Write-Host "[!] cant check the admins group"
+}
+
+Write-Host ""
+Write-Host "checking for duplicate users"
+
+$duplicates = $users |
+    Group-Object Name |
+    Where-Object { $_.Count -gt 1 }
+
+if ($duplicates) {
+    foreach ($duplicate in $duplicates) {
+        Write-Host "[!] duplicate username: $($duplicate.Name)"
+    }
+} else {
+    Write-Host "[+] no duplicate usernames found"
+}
+
+Write-Host ""
+Write-Host "checking for old passwords"
+
+$cutoff = (Get-Date).AddDays(-90)
+
+foreach ($user in $users) {
+    if ($user.Enabled -and $user.PasswordLastSet -and
+        $user.PasswordLastSet -lt $cutoff) {
+        Write-Host "[!] $($user.Name) has an old password"
+    }
+}
+
+Write-Host ""
+Write-Host "[+] thats all the users checked"
+Write-Host "[+] if u couldnt tell this script is done"</code></pre>
+        </details>
+      </li>
+    </ul>
+
+    <p class="hint">Run as administrator: <code>powershell -ExecutionPolicy Bypass -File .\script.ps1</code>. <code>password-management.bat</code> is the CMD version.</p>
+  </main>
+
+</body>
+</html>
